@@ -1,3 +1,8 @@
+local internal = BugFixesBoonsInternal
+local option_fns = internal.option_fns
+local patch_fns = internal.patch_fns
+local hook_fns = internal.hook_fns
+
 table.insert(option_fns,
     {
         type = "checkbox",
@@ -274,7 +279,7 @@ table.insert(patch_fns, {
 
 table.insert(hook_fns, function()
     modutil.mod.Path.Wrap("CheckAxeCastArm", function(baseFunc, triggerArgs, args)
-        if not config.SecondStageChanneling or not lib.isEnabled(public.store, public.definition.modpack) then
+        if not store.read("SecondStageChanneling") or not lib.isEnabled(store, public.definition.modpack) then
             return baseFunc(triggerArgs, args)
         end
         if HeroHasTrait("ApolloExCastBoon") and HeroHasTrait("ApolloSecondStageCastBoon") then

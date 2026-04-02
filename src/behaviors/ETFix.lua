@@ -1,3 +1,8 @@
+local internal = BugFixesBoonsInternal
+local option_fns = internal.option_fns
+local patch_fns = internal.patch_fns
+local hook_fns = internal.hook_fns
+
 table.insert(option_fns,
     {
         type = "checkbox",
@@ -27,7 +32,7 @@ table.insert(patch_fns, {
 
 table.insert(hook_fns, function()
     modutil.mod.Path.Wrap("CreateSecondAnubisWall", function(baseFunc, weaponData, args, triggerArgs)
-        if not config.ETFix or not lib.isEnabled(public.store, public.definition.modpack) then
+        if not store.read("ETFix") or not lib.isEnabled(store, public.definition.modpack) then
             return baseFunc(weaponData, args, triggerArgs)
         end
 

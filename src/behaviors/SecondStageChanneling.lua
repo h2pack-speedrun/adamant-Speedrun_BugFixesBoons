@@ -279,7 +279,7 @@ table.insert(patch_fns, {
 
 table.insert(hook_fns, function()
     modutil.mod.Path.Wrap("CheckAxeCastArm", function(baseFunc, triggerArgs, args)
-        if not store.read("SecondStageChanneling") or not lib.isEnabled(store, public.definition.modpack) then
+        if not store.read("SecondStageChanneling") or not lib.coordinator.isEnabled(store, public.definition.modpack) then
             return baseFunc(triggerArgs, args)
         end
         if HeroHasTrait("ApolloExCastBoon") and HeroHasTrait("ApolloSecondStageCastBoon") then

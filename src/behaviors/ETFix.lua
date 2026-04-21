@@ -31,7 +31,7 @@ table.insert(patch_fns, {
 })
 
 table.insert(hook_fns, function()
-    modutil.mod.Path.Wrap("CreateSecondAnubisWall", function(baseFunc, weaponData, args, triggerArgs)
+    lib.hooks.Wrap(internal, "CreateSecondAnubisWall", function(baseFunc, weaponData, args, triggerArgs)
         if not internal.store.read("ETFix") or not lib.isModuleEnabled(internal.store, public.definition.modpack) then
             return baseFunc(weaponData, args, triggerArgs)
         end

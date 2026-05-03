@@ -8,6 +8,7 @@ game = rom.game
 modutil = mods["SGG_Modding-ModUtil"]
 local chalk = mods["SGG_Modding-Chalk"]
 local reload = mods["SGG_Modding-ReLoad"]
+---@module "adamant-ModpackLib"
 ---@type AdamantModpackLib
 lib = mods["adamant-ModpackLib"]
 
@@ -15,30 +16,39 @@ local dataDefaults = import("config.lua")
 local config = chalk.auto("config.lua")
 
 local PACK_ID = "speedrun"
+local MODULE_ID = "BugFixesBoons"
 
 ---@class BugFixesBoonsInternal
 ---@field store ManagedStore|nil
 ---@field standaloneUi StandaloneRuntime|nil
+---@field PACK_ID string|nil
+---@field MODULE_ID string|nil
+---@field BuildStorage fun(): StorageSchema|nil
+---@field BuildPatchPlan fun(plan: MutationPlan, activeStore: StoreReader)|nil
 ---@field RegisterHooks fun()|nil
 ---@field DrawTab fun(imgui: table, session: AuthorSession)|nil
----@field DrawQuickContent fun(imgui: table, session: AuthorSession)|nil
 BugFixesBoonsInternal = BugFixesBoonsInternal or {}
 ---@type BugFixesBoonsInternal
 local internal = BugFixesBoonsInternal
 
-public.definition = {
-    modpack = PACK_ID,
-    id = "BugFixesBoons",
-    name = "Bug Fixes: Boons & Hammers",
-    tooltip = "Collection of bug fixes for boons and hammers.",
-    default = dataDefaults.Enabled,
-    affectsRunData = true,
-}
+internal.PACK_ID = PACK_ID
+internal.MODULE_ID = MODULE_ID
 
-public.host = nil
-local store
-local session
 internal.standaloneUi = nil
+
+local function registerGui()
+    rom.gui.add_imgui(function()
+        if internal.standaloneUi and internal.standaloneUi.renderWindow then
+            internal.standaloneUi.renderWindow()
+        end
+    end)
+
+    rom.gui.add_to_menu_bar(function()
+        if internal.standaloneUi and internal.standaloneUi.addMenuBar then
+            internal.standaloneUi.addMenuBar()
+        end
+    end)
+end
 
 local function init()
     import_as_fallback(rom.game)
@@ -47,36 +57,33 @@ local function init()
     import("logic.lua")
     import("ui.lua")
 
-    store, session = lib.createStore(config, public.definition, dataDefaults)
+    local definition = lib.prepareDefinition(internal, dataDefaults, {
+        modpack = PACK_ID,
+        id = MODULE_ID,
+        name = "Bug Fixes: Boons & Hammers",
+        tooltip = "Collection of bug fixes for boons and hammers.",
+        default = dataDefaults.Enabled,
+        affectsRunData = true,
+        storage = internal.BuildStorage(),
+        patchPlan = internal.BuildPatchPlan,
+    })
+
+    local store, session = lib.createStore(config, definition)
     internal.store = store
 
-    public.host = lib.createModuleHost({
-        definition = public.definition,
+    lib.createModuleHost({
+        definition = definition,
         store = store,
         session = session,
         hookOwner = internal,
         registerHooks = internal.RegisterHooks,
         drawTab = internal.DrawTab,
     })
-    internal.standaloneUi = lib.standaloneHost(public.host)
+    internal.standaloneUi = lib.standaloneHost()
 end
 
 local loader = reload.auto_single()
 
 modutil.once_loaded.game(function()
-    loader.load(nil, init)
-end)
-
----@diagnostic disable-next-line: redundant-parameter
-rom.gui.add_imgui(function()
-    if internal.standaloneUi and internal.standaloneUi.renderWindow then
-        internal.standaloneUi.renderWindow()
-    end
-end)
-
----@diagnostic disable-next-line: redundant-parameter
-rom.gui.add_to_menu_bar(function()
-    if internal.standaloneUi and internal.standaloneUi.addMenuBar then
-        internal.standaloneUi.addMenuBar()
-    end
+    loader.load(registerGui, init)
 end)

@@ -32,7 +32,7 @@ table.insert(patch_fns, {
 
 table.insert(hook_fns, function()
     lib.hooks.Wrap(internal, "CreateSecondAnubisWall", function(baseFunc, weaponData, args, triggerArgs)
-        if not internal.store.read("ETFix") or not lib.isModuleEnabled(internal.store, public.definition.modpack) then
+        if not internal.store.read("ETFix") or not lib.isModuleEnabled(internal.store, internal.PACK_ID) then
             return baseFunc(weaponData, args, triggerArgs)
         end
 

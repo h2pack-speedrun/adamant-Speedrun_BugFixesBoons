@@ -1,4 +1,4 @@
--- luacheck: globals BugFixesBoonsInternal public
+-- luacheck: globals BugFixesBoonsInternal
 local internal = BugFixesBoonsInternal
 
 internal.patch_fns = {}
@@ -7,9 +7,9 @@ internal.option_fns = {}
 
 local PACK_ID = "speedrun"
 
-local function BuildStorage(options)
+function internal.BuildStorage()
     local storage = {}
-    for _, option in ipairs(options) do
+    for _, option in ipairs(internal.option_fns) do
         if option.type == "checkbox" then
             table.insert(storage, {
                 type = "bool",
@@ -30,7 +30,5 @@ import("behaviors/OmegaCastFix.lua")
 import("behaviors/PoseidonWavesFix.lua")
 import("behaviors/SecondStageChanneling.lua")
 import("behaviors/ShimmeringFix.lua")
-
-public.definition.storage = BuildStorage(internal.option_fns)
 
 return internal

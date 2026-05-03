@@ -279,7 +279,7 @@ table.insert(patch_fns, {
 
 table.insert(hook_fns, function()
     lib.hooks.Wrap(internal, "CheckAxeCastArm", function(baseFunc, triggerArgs, args)
-        if not internal.store.read("SecondStageChanneling") or not lib.isModuleEnabled(internal.store, public.definition.modpack) then
+        if not internal.store.read("SecondStageChanneling") or not lib.isModuleEnabled(internal.store, internal.PACK_ID) then
             return baseFunc(triggerArgs, args)
         end
         if HeroHasTrait("ApolloExCastBoon") and HeroHasTrait("ApolloSecondStageCastBoon") then

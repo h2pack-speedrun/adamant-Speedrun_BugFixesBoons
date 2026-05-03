@@ -17,6 +17,7 @@ local config = chalk.auto("config.lua")
 
 local PACK_ID = "speedrun"
 local MODULE_ID = "BugFixesBoons"
+local PLUGIN_GUID = _PLUGIN.guid
 
 ---@class BugFixesBoonsInternal
 ---@field store ManagedStore|nil
@@ -72,6 +73,7 @@ local function init()
     internal.store = store
 
     lib.createModuleHost({
+        pluginGuid = PLUGIN_GUID,
         definition = definition,
         store = store,
         session = session,
@@ -79,7 +81,7 @@ local function init()
         registerHooks = internal.RegisterHooks,
         drawTab = internal.DrawTab,
     })
-    internal.standaloneUi = lib.standaloneHost()
+    internal.standaloneUi = lib.standaloneHost(PLUGIN_GUID)
 end
 
 local loader = reload.auto_single()

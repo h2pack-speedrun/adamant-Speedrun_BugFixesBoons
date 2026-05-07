@@ -5,7 +5,7 @@ local patch_fns = internal.patch_fns
 table.insert(option_fns,
     {
         type = "checkbox",
-        configKey = "OmegaCastFix",
+        alias = "OmegaCastFix",
         label = "Omega Cast Fix",
         default = true,
         tooltip =

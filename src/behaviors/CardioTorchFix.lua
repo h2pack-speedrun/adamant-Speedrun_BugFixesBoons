@@ -5,7 +5,7 @@ local patch_fns = internal.patch_fns
 table.insert(option_fns,
     {
         type = "checkbox",
-        configKey = "CardioTorchFix",
+        alias = "CardioTorchFix",
         label = "Cardio Torch Fix",
         default = true,
         tooltip =

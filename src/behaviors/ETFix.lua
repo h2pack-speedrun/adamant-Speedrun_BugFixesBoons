@@ -6,7 +6,7 @@ local hook_fns = internal.hook_fns
 table.insert(option_fns,
     {
         type = "checkbox",
-        configKey = "ETFix",
+        alias = "ETFix",
         label = "ET Fix",
         default = true,
         tooltip =

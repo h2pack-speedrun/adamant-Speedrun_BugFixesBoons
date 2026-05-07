@@ -5,7 +5,7 @@ local patch_fns = internal.patch_fns
 table.insert(option_fns,
     {
         type = "checkbox",
-        configKey = "ShimmeringFix",
+        alias = "ShimmeringFix",
         label = "Shimmering Moonshot Fix",
         default = true,
         tooltip =

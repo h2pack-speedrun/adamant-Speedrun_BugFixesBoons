@@ -6,7 +6,7 @@ local hook_fns = internal.hook_fns
 table.insert(option_fns,
     {
         type = "checkbox",
-        configKey = "SecondStageChanneling",
+        alias = "SecondStageChanneling",
         label = "Remove Second Channeling",
         default = true,
         tooltip =

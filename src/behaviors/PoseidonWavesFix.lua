@@ -5,7 +5,7 @@ local patch_fns = internal.patch_fns
 table.insert(option_fns,
     {
         type = "checkbox",
-        configKey = "PoseidonWavesFix",
+        alias = "PoseidonWavesFix",
         label = "Poseidon Waves Fix",
         default = true,
         tooltip =

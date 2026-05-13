@@ -1,17 +1,13 @@
-local internal = BugFixesBoonsInternal
-local option_fns = internal.option_fns
-local patch_fns = internal.patch_fns
-local hook_fns = internal.hook_fns
-
-table.insert(option_fns,
-    {
+local module = {
+    option = {
         type = "checkbox",
         alias = "SecondStageChanneling",
         label = "Remove Second Channeling",
         default = true,
         tooltip =
         "Removes 2nd stage channel of Glorious Disaster/Giga Moonburst, baking bonus into stage 1."
-    })
+    },
+}
 
 local function DeepCompare(a, b)
     if a == b then return true end
@@ -154,137 +150,143 @@ local function ReplaceGigaMoonburst()
     })
 end
 
-table.insert(patch_fns, {
-    key = "SecondStageChanneling",
-    fn = function(plan)
-        plan:transform(TraitData, "ApolloSecondStageCastBoon", function(trait)
-            if trait == nil then return trait end
+module.patches = {
+    {
+        key = "SecondStageChanneling",
+        fn = function(plan)
+            plan:transform(TraitData, "ApolloSecondStageCastBoon", function(trait)
+                if trait == nil then return trait end
 
-            local extraManaCost = 30
-            local baseWait = 0.8
-            local baseCost = 15
-            local copy = rom.game.DeepCopyTable(trait)
+                local extraManaCost = 30
+                local baseWait = 0.8
+                local baseCost = 15
+                local copy = rom.game.DeepCopyTable(trait)
 
-            copy.ReportedDifference = extraManaCost
-            copy.WeaponDataOverrideTraitRequirement = "ApolloExCastBoon"
-            copy.ChargeStageModifiers = nil
+                copy.ReportedDifference = extraManaCost
+                copy.WeaponDataOverrideTraitRequirement = "ApolloExCastBoon"
+                copy.ChargeStageModifiers = nil
 
-            copy.WeaponDataOverride = {
-                WeaponCastArm = {
-                    ManaCost = 0,
-                    OnChargeFunctionNames = { "DoWeaponCharge" },
-                    ChargeWeaponData = {
-                        OnStageReachedFunctionName = "CastChargeStage",
-                        EmptyChargeFunctionName = "EmptyCastCharge",
-                        OnNoManaForceRelease = "NoManaCastSecondStageForceRelease"
+                copy.WeaponDataOverride = {
+                    WeaponCastArm = {
+                        ManaCost = 0,
+                        OnChargeFunctionNames = { "DoWeaponCharge" },
+                        ChargeWeaponData = {
+                            OnStageReachedFunctionName = "CastChargeStage",
+                            EmptyChargeFunctionName = "EmptyCastCharge",
+                            OnNoManaForceRelease = "NoManaCastSecondStageForceRelease"
+                        },
+                        ChargeWeaponStages = {
+                            { ManaCost = baseCost + extraManaCost, Wait = baseWait },
+                            { RequiredTraitName = "ApolloExCastBoon", ManaCost = baseCost + extraManaCost, Wait = 0, ForceRelease = true, ResetIndicator = true }
+                        }
                     },
-                    ChargeWeaponStages = {
-                        { ManaCost = baseCost + extraManaCost, Wait = baseWait },
-                        { RequiredTraitName = "ApolloExCastBoon", ManaCost = baseCost + extraManaCost, Wait = 0, ForceRelease = true, ResetIndicator = true }
-                    }
-                },
-                WeaponCast = {
-                    ChargeWeaponStages = {
-                        { ManaCost = baseCost + extraManaCost, Wait = baseWait, ChannelSlowEventOnStart = true },
-                        { RequiredTraitName = "ApolloExCastBoon", ManaCost = baseCost + extraManaCost, Wait = 0, ForceRelease = true, ResetIndicator = true, SuperCharge = true }
-                    }
-                },
-                WeaponCastProjectileHades = {
-                    ChargeWeaponStages = {
-                        { ManaCost = baseCost + extraManaCost, Wait = baseWait, ChannelSlowEventOnStart = true },
-                        { RequiredTraitName = "ApolloExCastBoon", ManaCost = baseCost + extraManaCost, Wait = 0, ForceRelease = true, ResetIndicator = true, SuperCharge = true }
-                    }
-                },
-                WeaponAnywhereCast = {
-                    ChargeWeaponStages = {
-                        { ManaCost = baseCost + extraManaCost, Wait = baseWait, ChannelSlowEventOnStart = true },
-                        { RequiredTraitName = "ApolloExCastBoon", ManaCost = baseCost + extraManaCost, Wait = 0, ForceRelease = true, ResetIndicator = true, SuperCharge = true }
-                    }
-                },
-                WeaponCastProjectile = {
-                    ChargeWeaponStages = {
-                        { ManaCost = baseCost + extraManaCost, Wait = baseWait, ChannelSlowEventOnStart = true },
-                        { RequiredTraitName = "ApolloExCastBoon", ManaCost = baseCost + extraManaCost, Wait = 0, ForceRelease = true, ResetIndicator = true, SuperCharge = true }
-                    }
-                },
-                WeaponCastLob = {
-                    ChargeWeaponStages = {
-                        { ManaCost = baseCost + extraManaCost, Wait = baseWait, ChannelSlowEventOnStart = true },
-                        { RequiredTraitName = "ApolloExCastBoon", ManaCost = baseCost + extraManaCost, Wait = 0, ForceRelease = true, ResetIndicator = true, SuperCharge = true }
+                    WeaponCast = {
+                        ChargeWeaponStages = {
+                            { ManaCost = baseCost + extraManaCost, Wait = baseWait, ChannelSlowEventOnStart = true },
+                            { RequiredTraitName = "ApolloExCastBoon", ManaCost = baseCost + extraManaCost, Wait = 0, ForceRelease = true, ResetIndicator = true, SuperCharge = true }
+                        }
+                    },
+                    WeaponCastProjectileHades = {
+                        ChargeWeaponStages = {
+                            { ManaCost = baseCost + extraManaCost, Wait = baseWait, ChannelSlowEventOnStart = true },
+                            { RequiredTraitName = "ApolloExCastBoon", ManaCost = baseCost + extraManaCost, Wait = 0, ForceRelease = true, ResetIndicator = true, SuperCharge = true }
+                        }
+                    },
+                    WeaponAnywhereCast = {
+                        ChargeWeaponStages = {
+                            { ManaCost = baseCost + extraManaCost, Wait = baseWait, ChannelSlowEventOnStart = true },
+                            { RequiredTraitName = "ApolloExCastBoon", ManaCost = baseCost + extraManaCost, Wait = 0, ForceRelease = true, ResetIndicator = true, SuperCharge = true }
+                        }
+                    },
+                    WeaponCastProjectile = {
+                        ChargeWeaponStages = {
+                            { ManaCost = baseCost + extraManaCost, Wait = baseWait, ChannelSlowEventOnStart = true },
+                            { RequiredTraitName = "ApolloExCastBoon", ManaCost = baseCost + extraManaCost, Wait = 0, ForceRelease = true, ResetIndicator = true, SuperCharge = true }
+                        }
+                    },
+                    WeaponCastLob = {
+                        ChargeWeaponStages = {
+                            { ManaCost = baseCost + extraManaCost, Wait = baseWait, ChannelSlowEventOnStart = true },
+                            { RequiredTraitName = "ApolloExCastBoon", ManaCost = baseCost + extraManaCost, Wait = 0, ForceRelease = true, ResetIndicator = true, SuperCharge = true }
+                        }
                     }
                 }
-            }
 
-            copy.PropertyChanges = copy.PropertyChanges or {}
-            local propertyList = copy.PropertyChanges
-            local forceRelease = {
-                TraitName = "ApolloExCastBoon",
-                WeaponName = "WeaponCastArm",
-                WeaponProperty = "ForceMaxChargeRelease",
-                ChangeValue = false,
-            }
-            local chargeTime = {
-                TraitName = "ApolloExCastBoon",
-                WeaponName = "WeaponCastArm",
-                WeaponProperty = "ChargeTime",
-                ChangeValue = baseWait,
-            }
+                copy.PropertyChanges = copy.PropertyChanges or {}
+                local propertyList = copy.PropertyChanges
+                local forceRelease = {
+                    TraitName = "ApolloExCastBoon",
+                    WeaponName = "WeaponCastArm",
+                    WeaponProperty = "ForceMaxChargeRelease",
+                    ChangeValue = false,
+                }
+                local chargeTime = {
+                    TraitName = "ApolloExCastBoon",
+                    WeaponName = "WeaponCastArm",
+                    WeaponProperty = "ChargeTime",
+                    ChangeValue = baseWait,
+                }
 
-            if not ListContainsEquivalent(propertyList, forceRelease) then
-                table.insert(propertyList, forceRelease)
-            end
-            if not ListContainsEquivalent(propertyList, chargeTime) then
-                table.insert(propertyList, chargeTime)
-            end
+                if not ListContainsEquivalent(propertyList, forceRelease) then
+                    table.insert(propertyList, forceRelease)
+                end
+                if not ListContainsEquivalent(propertyList, chargeTime) then
+                    table.insert(propertyList, chargeTime)
+                end
 
-            return copy
-        end)
+                return copy
+            end)
 
-        plan:set(TraitData, "StaffSecondStageTrait", {
-            InheritFrom = { "WeaponTrait", "StaffHammerTrait" },
-            Icon = "Hammer_Staff_37",
-            GameStateRequirements = {
-                { Path = { "CurrentRun", "Hero", "Weapons" }, HasAll = { "WeaponStaffSwing" } },
-            },
-            RarityLevels = {
-                Common = { Multiplier = 1.0 },
-                Legendary = { Multiplier = 1.333 },
-            },
-            ManaCostModifiers = {
-                WeaponNames = { "WeaponStaffBall" },
-                ExcludeLinked = true,
-                ExWeapons = true,
-                ManaCostAdd = 30,
-                ReportValues = { ReportedManaCost = "ManaCostAdd" }
-            },
-            AddOutgoingDamageModifiers = {
-                ValidProjectiles = { "ProjectileStaffBallCharged" },
-                ValidWeaponMultiplier = { BaseValue = 4.0, SourceIsMultiplier = true },
-                ReportValues = { ReportedWeaponMultiplier = "ValidWeaponMultiplier" },
-            },
-            PropertyChanges = {
-                {
-                    WeaponName = "WeaponStaffBall",
-                    ProjectileName = "ProjectileStaffBallCharged",
-                    ProjectileProperties = { DamageRadius = 550, BlastSpeed = 2500 },
+            plan:set(TraitData, "StaffSecondStageTrait", {
+                InheritFrom = { "WeaponTrait", "StaffHammerTrait" },
+                Icon = "Hammer_Staff_37",
+                GameStateRequirements = {
+                    { Path = { "CurrentRun", "Hero", "Weapons" }, HasAll = { "WeaponStaffSwing" } },
                 },
-            },
-            ExtractValues = {
-                { Key = "ReportedManaCost", ExtractAs = "ManaCost" },
-                { Key = "ReportedWeaponMultiplier", ExtractAs = "DamageIncrease", Format = "PercentDelta" },
-            }
-        })
-    end
-})
+                RarityLevels = {
+                    Common = { Multiplier = 1.0 },
+                    Legendary = { Multiplier = 1.333 },
+                },
+                ManaCostModifiers = {
+                    WeaponNames = { "WeaponStaffBall" },
+                    ExcludeLinked = true,
+                    ExWeapons = true,
+                    ManaCostAdd = 30,
+                    ReportValues = { ReportedManaCost = "ManaCostAdd" }
+                },
+                AddOutgoingDamageModifiers = {
+                    ValidProjectiles = { "ProjectileStaffBallCharged" },
+                    ValidWeaponMultiplier = { BaseValue = 4.0, SourceIsMultiplier = true },
+                    ReportValues = { ReportedWeaponMultiplier = "ValidWeaponMultiplier" },
+                },
+                PropertyChanges = {
+                    {
+                        WeaponName = "WeaponStaffBall",
+                        ProjectileName = "ProjectileStaffBallCharged",
+                        ProjectileProperties = { DamageRadius = 550, BlastSpeed = 2500 },
+                    },
+                },
+                ExtractValues = {
+                    { Key = "ReportedManaCost", ExtractAs = "ManaCost" },
+                    { Key = "ReportedWeaponMultiplier", ExtractAs = "DamageIncrease", Format = "PercentDelta" },
+                }
+            })
+        end
+    },
+}
 
-table.insert(hook_fns, function()
-    lib.hooks.Wrap("CheckAxeCastArm", function(baseFunc, triggerArgs, args)
-        if not internal.store.read("SecondStageChanneling") or not lib.isModuleEnabled(internal.store, internal.PACK_ID) then
-            return baseFunc(triggerArgs, args)
-        end
-        if HeroHasTrait("ApolloExCastBoon") and HeroHasTrait("ApolloSecondStageCastBoon") then
-            SessionMapState.SuperchargeCast = true
-        end
-        baseFunc(triggerArgs, args)
-    end)
-end)
+module.hooks = {
+    function(host, store)
+        lib.hooks.Wrap("CheckAxeCastArm", function(baseFunc, triggerArgs, args)
+            if not store.read("SecondStageChanneling") or not host.isEnabled() then
+                return baseFunc(triggerArgs, args)
+            end
+            if HeroHasTrait("ApolloExCastBoon") and HeroHasTrait("ApolloSecondStageCastBoon") then
+                SessionMapState.SuperchargeCast = true
+            end
+            baseFunc(triggerArgs, args)
+        end)
+    end,
+}
+
+return module

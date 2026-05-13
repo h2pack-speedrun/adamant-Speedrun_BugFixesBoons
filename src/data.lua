@@ -1,15 +1,27 @@
--- luacheck: globals BugFixesBoonsInternal
-local internal = BugFixesBoonsInternal
-
-internal.patch_fns = {}
-internal.hook_fns = {}
-internal.option_fns = {}
-
 local PACK_ID = "speedrun"
 
-function internal.BuildStorage()
+local data = {
+    patches = {},
+    hooks = {},
+    options = {},
+}
+
+local function register(path)
+    local behavior = import(path)
+    if behavior.option then
+        table.insert(data.options, behavior.option)
+    end
+    for _, patch in ipairs(behavior.patches or {}) do
+        table.insert(data.patches, patch)
+    end
+    for _, hook in ipairs(behavior.hooks or {}) do
+        table.insert(data.hooks, hook)
+    end
+end
+
+function data.buildStorage()
     local storage = {}
-    for _, option in ipairs(internal.option_fns) do
+    for _, option in ipairs(data.options) do
         if option.type == "checkbox" then
             table.insert(storage, {
                 type = "bool",
@@ -23,12 +35,12 @@ function internal.BuildStorage()
     return storage
 end
 
-import("behaviors/BraidFix.lua")
-import("behaviors/CardioTorchFix.lua")
-import("behaviors/ETFix.lua")
-import("behaviors/OmegaCastFix.lua")
-import("behaviors/PoseidonWavesFix.lua")
-import("behaviors/SecondStageChanneling.lua")
-import("behaviors/ShimmeringFix.lua")
+register("behaviors/BraidFix.lua")
+register("behaviors/CardioTorchFix.lua")
+register("behaviors/ETFix.lua")
+register("behaviors/OmegaCastFix.lua")
+register("behaviors/PoseidonWavesFix.lua")
+register("behaviors/SecondStageChanneling.lua")
+register("behaviors/ShimmeringFix.lua")
 
-return internal
+return data

@@ -278,7 +278,7 @@ table.insert(patch_fns, {
 })
 
 table.insert(hook_fns, function()
-    lib.hooks.Wrap(internal, "CheckAxeCastArm", function(baseFunc, triggerArgs, args)
+    lib.hooks.Wrap("CheckAxeCastArm", function(baseFunc, triggerArgs, args)
         if not internal.store.read("SecondStageChanneling") or not lib.isModuleEnabled(internal.store, internal.PACK_ID) then
             return baseFunc(triggerArgs, args)
         end
